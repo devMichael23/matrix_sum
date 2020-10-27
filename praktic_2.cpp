@@ -57,11 +57,6 @@ int main()
             result += (matrix[i][i] + matrix[i][n - i - 1]);
         }
 
-    // for (int i = 0; i < n; i++) 
-    // {
-       // result += (matrix[i][i] + matrix[i][n - i - 1]);
-    // }
-
     //print_matrix(matrix, n, m);
     cout << endl;
     cout << result << endl;
