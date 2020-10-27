@@ -13,13 +13,13 @@ int** create_matrix(int n, int m)
         array[i] = new int[m];
     }
 
-    // Заполнение рандомными числами
+    // Заполнение рандомными числами от 0 до 20
     srand(time(0));
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < m; j++)
         {
-            array[i][j] = 0 + rand() % 1000;;
+            array[i][j] = 0 + rand() % 20;
         }
     }
 
@@ -28,11 +28,11 @@ int** create_matrix(int n, int m)
 }
 
 // Вывод матрицы
-void print_matrix(int** array)
+void print_matrix(int** array, int n, int m)
 {
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < 6; j++)
+        for (int j = 0; j < m; j++)
         {
             std::cout << array[i][j] << " ";
         }
@@ -40,12 +40,25 @@ void print_matrix(int** array)
     }
 }
 
-int main()
+
+
+int main() 
 {
-#pragma omp parallel
+    int n = 50;
+    int m = 50;
+    int** matrix = create_matrix(n, m);
+    int result = 0;
+
+    for (int i = 0; i < n; i++) 
     {
-        cout << "Hello World\n";
+        result += (matrix[i][i] + matrix[i][n - i - 1]);
     }
+
+    //print_matrix(matrix, n, m);
+    cout << endl;
+    cout << result << endl;
+
+    system("pause");
 
     return 0;
 }
