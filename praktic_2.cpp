@@ -40,13 +40,23 @@ void print_matrix(int** array, int n, int m)
     }
 }
 
+// Подсчет суммы последовательной реализации
+int get_result(int** matrix,int n)
+{
+    int result = 0;
+    for (int i = 0; i < n; i++)
+    {
+        result += (matrix[i][i] + matrix[i][n - i - 1]);
+    }
+
+    return result;
+}
 
 
 int main() 
 {
     int n = 50;
-    int m = 50;
-    int** matrix = create_matrix(n, m);
+    int** matrix = create_matrix(n, n);
     int result = 0;
     int i;
 
@@ -57,8 +67,8 @@ int main()
             result += (matrix[i][i] + matrix[i][n - i - 1]);
         }
 
-    //print_matrix(matrix, n, m);
-    cout << endl;
+    int result_seq = get_result(matrix, n);
+    cout << result_seq << endl;
     cout << result << endl;
 
     system("pause");
