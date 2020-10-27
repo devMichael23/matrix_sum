@@ -48,11 +48,19 @@ int main()
     int m = 50;
     int** matrix = create_matrix(n, m);
     int result = 0;
+    int i;
 
-    for (int i = 0; i < n; i++) 
-    {
-        result += (matrix[i][i] + matrix[i][n - i - 1]);
-    }
+    omp_set_num_threads(16);
+#pragma omp parallel for shared(matrix, result, n) private(i)
+        for (i = 0; i < n; i++)
+        {
+            result += (matrix[i][i] + matrix[i][n - i - 1]);
+        }
+
+    // for (int i = 0; i < n; i++) 
+    // {
+       // result += (matrix[i][i] + matrix[i][n - i - 1]);
+    // }
 
     //print_matrix(matrix, n, m);
     cout << endl;
