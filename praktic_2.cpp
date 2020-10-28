@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <time.h>
 #include <ctime>
 #include <omp.h>
 
@@ -52,24 +53,38 @@ int get_result(int** matrix,int n)
     return result;
 }
 
-
-int main() 
+void do_test(int** matrix, int n, int threads)
 {
-    int n = 50;
-    int** matrix = create_matrix(n, n);
     int result = 0;
-    int i;
+    double st = omp_get_wtime();
+#pragma omp parallel num_threads(threads)
+    {
+        result = 0;
 
-    omp_set_num_threads(16);
-#pragma omp parallel for shared(matrix, result, n) private(i)
-        for (i = 0; i < n; i++)
+    #pragma omp parallel for
+        for (int i = 0; i < n; i++)
         {
             result += (matrix[i][i] + matrix[i][n - i - 1]);
         }
 
-    int result_seq = get_result(matrix, n);
-    cout << result_seq << endl;
-    cout << result << endl;
+    }
+    double end = omp_get_wtime();
+    double sec = (end - st);
+    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
+}
+
+int main() 
+{
+    setlocale(LC_ALL, "Russian");
+
+    int n = 1000;
+    int** matrix = create_matrix(n, n);
+
+
+    int threads = 1;
+    do_test(matrix, n, threads);
+    threads = 2;
+    do_test(matrix, n, threads);
 
     system("pause");
 
