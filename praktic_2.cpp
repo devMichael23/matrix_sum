@@ -53,11 +53,11 @@ int get_result(int** matrix,int n)
     return result;
 }
 
-void do_test(int** matrix, int n, int threads)
+int do_test(int** matrix, int n, int threads)
 {
     int result = 0;
-    double st = omp_get_wtime();
-#pragma omp parallel num_threads(threads)
+    omp_set_num_threads(threads);
+#pragma omp parallel
     {
         result = 0;
 
@@ -68,24 +68,52 @@ void do_test(int** matrix, int n, int threads)
         }
 
     }
-    double end = omp_get_wtime();
-    double sec = (end - st);
-    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
+    
+    return result;
 }
 
-int main() 
+int main()
 {
     setlocale(LC_ALL, "Russian");
 
-    int n = 1000;
+    int n = 1500;
     int** matrix = create_matrix(n, n);
+    int result = 0;
+    int threads = 32;
 
+    double start = clock();
+    result = do_test(matrix, n, threads);
+    double end = clock();
+    double sec = (end - start) / CLOCKS_PER_SEC;
+    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
 
-    int threads = 1;
-    do_test(matrix, n, threads);
-    threads = 2;
-    do_test(matrix, n, threads);
+    threads = 16;
+    start = clock();
+    result = do_test(matrix, n, threads);
+    end = clock();
+    sec = (end - start) / CLOCKS_PER_SEC;
+    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
 
+    threads = 8;
+    start = clock();
+    result = do_test(matrix, n, threads);
+    end = clock();
+    sec = (end - start) / CLOCKS_PER_SEC;
+    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
+
+    threads = 4;
+    start = clock();
+    result = do_test(matrix, n, threads);
+    end = clock();
+    sec = (end - start) / CLOCKS_PER_SEC;
+    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
+
+    threads = 1;
+    start = clock();
+    result = do_test(matrix, n, threads);
+    end = clock();
+    sec = (end - start) / CLOCKS_PER_SEC;
+    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
     system("pause");
 
     return 0;
