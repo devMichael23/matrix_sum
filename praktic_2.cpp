@@ -14,18 +14,22 @@ int** create_matrix(int n, int m)
         array[i] = new int[m];
     }
 
-    // Заполнение рандомными числами от 0 до 20
+    return array;
+}
+
+// Заполнение матрицы рандомными числами от 0 до 20
+int** rand_matrix(int** matrix, int n, int m)
+{
     srand(time(0));
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < m; j++)
         {
-            array[i][j] = 0 + rand() % 20;
+            matrix[i][j] = 0 + rand() % 20;
         }
     }
 
-
-    return array;
+    return matrix;
 }
 
 // Вывод матрицы
@@ -41,8 +45,8 @@ void print_matrix(int** array, int n, int m)
     }
 }
 
-// Подсчет суммы последовательной реализации
-int get_result(int** matrix,int n)
+// Подсчет суммы диагональных значений матрицы
+int get_result(int** matrix, int n, int threads)
 {
     int result = 0;
     for (int i = 0; i < n; i++)
@@ -75,46 +79,136 @@ int do_test(int** matrix, int n, int threads)
 int main()
 {
     setlocale(LC_ALL, "Russian");
-
-    int n = 1500;
-    int** matrix = create_matrix(n, n);
+    cout << "Практическая работа №2" << endl;
+    cout << "Параллельное программирование с использованием технолгии OpenMP" << endl;
+    cout << "Петрушинин Михаил\n" << endl;
+    int choose;
+    cout << "1 - Заполнить матрицу в ручную.\n2 - Заполнить матрицу автоматически\n> ";
+    cin >> choose;
+    int** matrix;
     int result = 0;
-    int threads = 32;
+    int threads = 0;
 
-    double start = clock();
-    result = do_test(matrix, n, threads);
-    double end = clock();
-    double sec = (end - start) / CLOCKS_PER_SEC;
-    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
+    if (choose == 1)
+    {
+        int n;
+        cout << "\nВведите размер квадратной матрицы:\n> ";
+        cin >> n;
+        matrix = create_matrix(n, n);
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                cout << "Введите x" << i << "y" << j << "\n> ";
+                cin >> matrix[i][j];
+            }
+        }
 
-    threads = 16;
-    start = clock();
-    result = do_test(matrix, n, threads);
-    end = clock();
-    sec = (end - start) / CLOCKS_PER_SEC;
-    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
+        threads = 1;
+        double start = clock();
+        result = get_result(matrix, n, threads);
+        double end = clock();
+        double sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
 
-    threads = 8;
-    start = clock();
-    result = do_test(matrix, n, threads);
-    end = clock();
-    sec = (end - start) / CLOCKS_PER_SEC;
-    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
+        threads = 2;
+        start = clock();
+        result = get_result(matrix, n, threads);
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
 
-    threads = 4;
-    start = clock();
-    result = do_test(matrix, n, threads);
-    end = clock();
-    sec = (end - start) / CLOCKS_PER_SEC;
-    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
+        threads = 4;
+        start = clock();
+        result = get_result(matrix, n, threads);
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
 
-    threads = 1;
-    start = clock();
-    result = do_test(matrix, n, threads);
-    end = clock();
-    sec = (end - start) / CLOCKS_PER_SEC;
-    cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "; Количество потоков = " << threads << endl;
+        threads = 8;
+        start = clock();
+        result = get_result(matrix, n, threads);
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
+
+        threads = 16;
+        start = clock();
+        result = get_result(matrix, n, threads);
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
+
+        threads = 32;
+        start = clock();
+        result = get_result(matrix, n, threads);
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
+    }
+    else if (choose == 2)
+    {
+        int n;
+        cout << "\nВведите размер квадратной матрицы:\n> ";
+        cin >> n;
+        matrix = create_matrix(n, n);
+        matrix = rand_matrix(matrix, n, n);
+
+        threads = 1;
+        double start = clock();
+
+        result = get_result(matrix, n, threads);
+
+        double end = clock();
+        double sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
+
+        threads = 2;
+        start = clock();
+
+        result = get_result(matrix, n, threads);
+
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
+
+        threads = 4;
+        start = clock();
+
+        result = get_result(matrix, n, threads);
+
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
+
+        threads = 8;
+        start = clock();
+
+        result = get_result(matrix, n, threads);
+
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
+
+        threads = 16;
+        start = clock();
+
+        result = get_result(matrix, n, threads);
+
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
+
+        threads = 32;
+        start = clock();
+
+        result = get_result(matrix, n, threads);
+
+        end = clock();
+        sec = (end - start);
+        cout << "Сумма диагональныйх элементов = " << result << "; Время = " << sec << "ms; Количество потоков = " << threads << endl;
+    }
+
     system("pause");
-
     return 0;
 }
