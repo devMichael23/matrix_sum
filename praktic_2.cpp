@@ -57,7 +57,7 @@ int get_result(int** matrix, int n, int threads)
     return result;
 }
 
-int do_test(int** matrix, int n, int threads)
+int get_result(int** matrix, int n, int threads)
 {
     int result = 0;
     omp_set_num_threads(threads);
