@@ -49,17 +49,6 @@ void print_matrix(int** array, int n, int m)
 int get_result(int** matrix, int n, int threads)
 {
     int result = 0;
-    for (int i = 0; i < n; i++)
-    {
-        result += (matrix[i][i] + matrix[i][n - i - 1]);
-    }
-
-    return result;
-}
-
-int get_result(int** matrix, int n, int threads)
-{
-    int result = 0;
     omp_set_num_threads(threads);
 #pragma omp parallel
     {
