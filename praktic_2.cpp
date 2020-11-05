@@ -48,20 +48,32 @@ void print_matrix(int** array, int n, int m)
 // Подсчет суммы диагональных значений матрицы
 int get_result(int** matrix, int n, int threads)
 {
-    int result = 0;
+    int result_main = 0;
+    int result_side = 0;
     omp_set_num_threads(threads);
 #pragma omp parallel
     {
-        result = 0;
+        result_main = 0;
+        result_side = 0;
 
-    #pragma omp parallel for
+#pragma omp parallel for
         for (int i = 0; i < n; i++)
         {
-            result += (matrix[i][i] + matrix[i][n - i - 1]);
+            result_main += matrix[i][i];
         }
 
+#pragma omp parallel for
+        for (int i = 0; i < n; i++)
+        {
+    #pragma omp parallel for
+            for (int j = 0; j < n; j++)
+            {
+                if (i + j == n - 1)
+                    result_side += matrix[i][j];
+            }
+        }
     }
-    
+    int result = result_main + result_side;
     return result;
 }
 
