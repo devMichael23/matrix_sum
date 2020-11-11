@@ -1,6 +1,5 @@
-﻿#include <iostream>
+#include <iostream>
 #include <time.h>
-#include <ctime>
 #include <omp.h>
 
 using namespace std;
@@ -36,6 +35,7 @@ int** rand_matrix(int** matrix, int n, int m)
 void print_matrix(int** array, int n, int m)
 {
     for (int i = 0; i < n; i++)
+    std::cout << "x[" << i << "] = ";
     {
         for (int j = 0; j < m; j++)
         {
