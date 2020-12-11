@@ -54,19 +54,20 @@ void print_matrix(int** array, int raw, int column)
 }
 
 
-// Подсчет суммы диагональных значений матрицы
+// Последовательный подсчет суммы диагональных значений матрицы
 int get_result(int** matrix, int n)
 {
     int result = 0;
 
     for (int i = 0; i < n; i++)
     {
-        result += (matrix[i][i] + matrix[i][n - i - 1]);
+		result += (matrix[i][i] + matrix[i][n - i - 1]);
     }
 
     return result;
 }
 
+// Распределенный подсчет суммы диагональных значений матрицы
 void mpi_get_result(int** matrix, int n, int rank, int size)
 {
     int count = n / size;
@@ -89,22 +90,101 @@ void mpi_get_result(int** matrix, int n, int rank, int size)
     if (rank == 0)
     {
         double end = MPI_Wtime();
-        double time = end - st;
-        cout << "result = " << glob << "; time = " << time << endl;
+        double time = (end - st);
+        cout << "n = " << n << endl;
+        cout << "result = " << glob << "; time = " << time << "sec; n = " << n << endl;
+    }
+}
+
+// Запуск вычислений
+void run(int* n, int size, int rank, bool mpi, int code = 0)
+{
+    if (!mpi)
+    {
+        if (code == 2)
+        {
+            cout << endl;
+            cout << "Последовательный метод вычисления:" << endl;
+            for (int i = 0; i < 6; i++)
+            {
+                int** matrix = create_matrix(n[i], n[i], 1);
+                cout << "n = " << n[i] << endl;
+                clock_t start = clock();
+
+                int result = get_result(matrix, n[i]);
+
+                clock_t end = clock();
+                double time = (double)(end - start) / CLOCKS_PER_SEC;
+                cout << "result = " << result << "; time = " << time << "sec" << endl;
+                for (int j = 0; j < n[i]; j++)
+                delete[] matrix[j];
+            delete[] matrix;
+        }
+            }
+        }
+        else if (code == 1)
+        {
+            int len;
+            
+            cout << "Введите размер матрицы\n> ";
+            cin >> len;
+            int** matrix = create_matrix(len, len);
+            for (int i = 0; i < len; i++)
+            {
+                for (int j = 0; j < len; j++)
+                {
+                    cout << "Введите x" << i << "y" << j << "\n> ";
+                    cin >> matrix[i][j];
+                }
+            }
+            cout << endl;
+            cout << "Последовательный метод вычисления:" << endl;
+            cout << "n = " << len << endl;
+            clock_t start = clock();
+
+            int result = get_result(matrix, len);
+
+            clock_t end = clock();
+            double time = (double)(end - start) / CLOCKS_PER_SEC;
+            cout << "Matrix:" << endl;
+            print_matrix(matrix, len, len);
+            cout << "result = " << result << "; time = " << time << "sec" << endl;
+            cout << endl;
+            for (int i = 0; i < len; j++)
+                delete[] matrix[i];
+            delete[] matrix;
+        }
+        }
+    }
+    else
+    {
+        if (rank == 0)
+        {
+            cout << endl;
+            cout << "Распределенный метод вычисления:" << endl;
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            int** matrix = create_matrix(n[i], n[i], 1);
+            mpi_get_result(matrix, n[i], rank, size);
+            for (int j = 0; j < n[i]; j++)
+                delete[] matrix[j];
+            delete[] matrix;
+        }
     }
 }
 
 int main(int* argc, char** argv)
 {
     setlocale(LC_ALL, "Russian");
-    int size, rank;
-    int n = 3000;
-    int** matrix = create_matrix(n, n, 1);
+	int size, rank;
+    int* n = new int[] { 500, 2500, 3000, 4000, 6000, 6500 };
+    int** matrix;
 
 
-    MPI_Init(argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Init(argc, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     if (rank == 0)
     {
@@ -115,26 +195,25 @@ int main(int* argc, char** argv)
 
     
 
-    if (rank == 1)
+    if (size == 1)
     {
-        cout << endl;
-        cout << "Последовательный метод вычисления:" << endl;
-        cout << "n = " << n << endl;
-        clock_t start = clock();
-
-        int result = get_result(matrix, n);
-
-        clock_t end = clock();
-        double time = (double)(end - start) / CLOCKS_PER_SEC;
-        cout << "result = " << result << "; time = " << time << endl;
-        cout << endl;
+        int choose;
+        cout << "1 - Заполнить матрицу в ручную.\n2 - Заполнить матрицу автоматически\n> ";
+        cin >> choose;
+        run(n, size, rank, false, choose);
     }
     else
     {
-        mpi_get_result(matrix, n, rank, size);
+        int choose = 0;
+        if (rank == 0)
+        {
+            cout << "1 - Заполнить матрицу в ручную.\n2 - Заполнить матрицу автоматически\n> ";
+            cin >> choose;
+        }
+        run(n, size, rank, true, choose);
     }
 
-    MPI_Finalize();
+	MPI_Finalize();
 
-    return 0;
+	return 0;
 }
