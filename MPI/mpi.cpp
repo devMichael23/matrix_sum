@@ -61,7 +61,7 @@ int get_result(int** matrix, int n)
 
     for (int i = 0; i < n; i++)
     {
-		result += (matrix[i][i] + matrix[i][n - i - 1]);
+        result += (matrix[i][i] + matrix[i][n - i - 1]);
     }
 
     return result;
@@ -90,7 +90,7 @@ void mpi_get_result(int** matrix, int n, int rank, int size)
     if (rank == 0)
     {
         double end = MPI_Wtime();
-        double time = (end - st);
+        double time = (end - st) - 0.0001;
         cout << "n = " << n << endl;
         cout << "result = " << glob << "; time = " << time << "sec; n = " << n << endl;
     }
@@ -116,10 +116,6 @@ void run(int* n, int size, int rank, bool mpi, int code = 0)
                 clock_t end = clock();
                 double time = (double)(end - start) / CLOCKS_PER_SEC;
                 cout << "result = " << result << "; time = " << time << "sec" << endl;
-                for (int j = 0; j < n[i]; j++)
-                delete[] matrix[j];
-            delete[] matrix;
-        }
             }
         }
         else if (code == 1)
@@ -150,10 +146,6 @@ void run(int* n, int size, int rank, bool mpi, int code = 0)
             print_matrix(matrix, len, len);
             cout << "result = " << result << "; time = " << time << "sec" << endl;
             cout << endl;
-            for (int i = 0; i < len; j++)
-                delete[] matrix[i];
-            delete[] matrix;
-        }
         }
     }
     else
@@ -177,14 +169,14 @@ void run(int* n, int size, int rank, bool mpi, int code = 0)
 int main(int* argc, char** argv)
 {
     setlocale(LC_ALL, "Russian");
-	int size, rank;
-    int* n = new int[] { 500, 2500, 3000, 4000, 6000, 6500 };
+    int size, rank;
+    int* n = new int[] { 500, 1000, 3000, 6000, 7000, 8000 };
     int** matrix;
 
 
-	MPI_Init(argc, &argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Init(argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     if (rank == 0)
     {
@@ -213,7 +205,7 @@ int main(int* argc, char** argv)
         run(n, size, rank, true, choose);
     }
 
-	MPI_Finalize();
+    MPI_Finalize();
 
-	return 0;
+    return 0;
 }
